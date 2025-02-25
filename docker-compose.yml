@@ -1,0 +1,26 @@
+# docker compose can run multiple containers. its creates a network which communicates between without hassle
+version: '3.1'
+services:
+  web:
+    build: ./src/learn_monitoring
+    ports:
+      - "8000:80"
+
+  prometheus:
+    build: 
+      context: .
+      dockerfile: dockerfile-prometheus.yml
+    ports:
+      - "9090:9090"
+    configs:
+      - source: prometheus_config
+        target: /etc/prometheus/prometheus.yml
+    depends_on:
+      - web
+
+  grafana:
+    image: grafana/grafana-enterprise
+    ports:
+      - "3001:3000"
+    depends_on:
+      - prometheus
